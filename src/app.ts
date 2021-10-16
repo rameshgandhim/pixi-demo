@@ -1,8 +1,7 @@
-import * as PIXI from 'pixi.js';
+// import * as PIXI from 'pixi.js';
 import {
   Application, Loader, Ticker, Sprite, Texture, Text,
 } from 'pixi.js';
-import { initializeApp } from 'firebase/app';
 import { CardShuffler } from './app/CardsShuffler';
 import { FireParticle } from './app/FireParticle';
 import { FPSMeter } from './app/FPSMeter';
@@ -13,35 +12,19 @@ import { RandomImageTool } from './app/RandomImageTool';
 import { Tweener } from './app/Tween';
 import { ScreenConfig } from './app/ScreenConfig';
 
-// Import the functions you need from the SDKs you need
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+// disabled as of now.
+// import { firebaseApp } from './firebaseConfig';
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: 'AIzaSyARWfnfZlizjmfmf9fktCMuVKm_C3c7o1I',
-  authDomain: 'pixijs-demo-f3037.firebaseapp.com',
-  projectId: 'pixijs-demo-f3037',
-  storageBucket: 'pixijs-demo-f3037.appspot.com',
-  messagingSenderId: '71883800219',
-  appId: '1:71883800219:web:e78d82f9ba030aa69b903e',
-};
-
-// Initialize Firebase
-const firebaseApp = initializeApp(firebaseConfig);
-
-console.log('initialized firebase app', firebaseApp.name);
+// console.log('initialized firebase app', firebaseApp.name);
 
 // Enables Pixi Dev tool to work
-declare let window: Window & { PIXI: unknown };
-window.PIXI = PIXI;
-// document.head.requestFullscreen();
+// declare let window: Window & { PIXI: unknown };
+// window.PIXI = PIXI;
 
 const bodyWidth = document.body.clientWidth;
 const bodyHeight = document.body.clientHeight;
 const canvasElement = document.getElementById('gameCanvas') as HTMLCanvasElement;
 
-console.log('body widht and height', bodyWidth, bodyHeight);
 // create and append app
 const app = new Application({
   backgroundColor: 0x1099bb, // light blue

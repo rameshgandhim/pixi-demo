@@ -29,6 +29,8 @@ export class CardShuffler extends GameObject {
 
   pendingTweens: Tween[] = [];
 
+  shufflingInProgress = false;
+
   constructor(private loader: Loader,
     private tweener: Tweener,
     private screen: ScreenConfig) {
@@ -71,7 +73,14 @@ export class CardShuffler extends GameObject {
 
   private onStart() {
     console.log('start shuffling');
-    this.startShuffling();
+    if (!this.shufflingInProgress) {
+      this.startBtnText.text = 'Stop';
+      this.startShuffling();
+      this.shufflingInProgress = true;
+    } else {
+      this.shufflingInProgress = false;
+      this.startBtnText.text = 'Start';
+    }
   }
 
   private readonly constructSprites = () => {
@@ -117,8 +126,10 @@ export class CardShuffler extends GameObject {
 
   private async startShuffling() {
     this.currentShufflingIdx -= 1;
-    await firstValueFrom(timer(1000).pipe(take(1)));
-    this.shuffleCard(this.currentShufflingIdx);
+    if (this.currentShufflingIdx >= 0) {
+      await firstValueFrom(timer(1000).pipe(take(1)));
+      this.shuffleCard(this.currentShufflingIdx);
+    }
   }
 
   private shuffleCard(idx: number): void {
@@ -153,7 +164,7 @@ export class CardShuffler extends GameObject {
       this.pendingTweens.splice(pendingIdx, 1);
     }
 
-    if (idx !== 0 && this.visible) {
+    if (idx !== 0 && this.visible && this.shufflingInProgress) {
       this.startShuffling();
     }
   }
@@ -184,6 +195,8 @@ export class CardShuffler extends GameObject {
   reset(): void {
     this.resetCards();
     this.currentShufflingIdx = totalSprites;
+    this.shufflingInProgress = false;
+    this.startBtnText.text = 'Start';
   }
 
   private unsubscribe() {
@@ -193,6 +206,7 @@ export class CardShuffler extends GameObject {
     }
 
     this.pendingTweens.forEach((t) => this.tweener.stop(t));
+    this.shufflingInProgress = false;
     this.pendingTweens = [];
   }
 }

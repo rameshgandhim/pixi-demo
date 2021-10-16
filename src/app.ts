@@ -97,7 +97,9 @@ function addGameObject(g: GameObject): void {
 }
 
 function tryForFullScreen(): void {
-  document.body.requestFullscreen();
+  if (document.body.requestFullscreen) {
+    document.body.requestFullscreen();
+  }
 }
 
 function createbtn(btnText: string, callback: () => void): Sprite {
@@ -187,7 +189,7 @@ loader.load(() => {
 
   const fullScreenBtn = createfullscreen(screenConfig.width, 0, () => {
     console.log('full button');
-    document.head.requestFullscreen();
+    tryForFullScreen();
   });
 
   app.stage.addChild(backBtn);

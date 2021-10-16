@@ -50,7 +50,7 @@ export const fireEmitter: any = {
   'spawnCircle': {
     'x': 0,
     'y': 0,
-    'r': 1000,
+    'r': 1,
   },
   'behaviors': [
     {
@@ -187,7 +187,7 @@ export const sparkEmitter: any = {
   'blendMode': 'normal',
   'frequency': 0.001,
   'emitterLifetime': -1,
-  'maxParticles': 1000,
+  'maxParticles': 100,
   'pos': {
     'x': 0,
     'y': 0,

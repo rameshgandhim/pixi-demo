@@ -147,12 +147,12 @@ export class RandomImageTool extends GameObject {
       obj3.y = maxHeight * 2 + padding;
     }
 
-    console.log(`Max Height ${maxHeight} and Width ${maxWidth}`);
+    // console.log(`Max Height ${maxHeight} and Width ${maxWidth}`);
 
     for (let i = 0; i < 2; i += 1) {
       const selectedObj = allObjects[i];
       if (selectedObj instanceof Text) {
-        console.log(`Index ${i} is text`);
+        // console.log(`Index ${i} is text`);
         if (this.screen.orientation === 'landscape') {
           selectedObj.y = maxHeight / 2 + padding;
         } else {

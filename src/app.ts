@@ -38,17 +38,24 @@ declare let window: Window & { PIXI: unknown };
 window.PIXI = PIXI;
 // document.head.requestFullscreen();
 
+const bodyWidth = window.screen.width;
+const bodyHeight = window.screen.height;
+const canvasElement = document.getElementById('gameCanvas') as HTMLCanvasElement;
+
+console.log('body widht and height', bodyWidth, bodyHeight);
 // create and append app
 const app = new Application({
   backgroundColor: 0x1099bb, // light blue
   sharedTicker: true,
   sharedLoader: true,
   // resolution: devicePixelRatio,
-  resizeTo: window,
+  // resizeTo: document,
+  antialias: true,
+  view: canvasElement,
+  width: bodyWidth,
+  height: bodyHeight,
 });
-document.body.style.width = '100wh';
-document.body.style.height = '100vh';
-document.body.style.margin = '0px';
+
 document.body.appendChild(app.view);
 const loader = Loader.shared;
 const ticker = Ticker.shared;
@@ -77,13 +84,14 @@ function tryForFullScreen(): void {
   document.body.requestFullscreen();
 }
 
-function createback(onbackCallback: () => void): Sprite {
+function createback(x: number, y: number, onbackCallback: () => void): Sprite {
   const buttonTex = Texture.from('button');
   const button = new Sprite(buttonTex);
   // button.anchor.set(1, 0);
-  button.y = 0;
-  button.x = document.body.offsetWidth - buttonTex.width;
+  button.y = y;
+  button.x = x - buttonTex.width;
   button.interactive = true;
+  button.name = 'back_btn';
   button.addListener('pointerdown', onbackCallback);
   const text = new Text('back', {
     align: 'left',
@@ -98,6 +106,8 @@ function createback(onbackCallback: () => void): Sprite {
 
 // when loader is ready
 loader.load(() => {
+  tryForFullScreen();
+  console.log('devicePixelRatio', devicePixelRatio);
   const screenConfig: ScreenConfig = {
     width: app.screen.width,
     height: app.screen.height,
@@ -125,7 +135,7 @@ loader.load(() => {
   addGameObject(fireParticle);
   addGameObject(randomImageTool);
 
-  const backBtn = createback(() => {
+  const backBtn = createback(screenConfig.width, 0, () => {
     console.log('back button');
     gameMenu.optionSelected.next(-1);
     backBtn.visible = false;

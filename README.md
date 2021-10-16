@@ -2,7 +2,10 @@
     npm start
 
 # Build
-    npm run build
+    Development: 
+        npm run build:dev
+    Production:
+        npm run build:prod
 
 # Deploy 
     bash deploy.sh

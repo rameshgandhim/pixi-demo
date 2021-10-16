@@ -3,3 +3,6 @@
 
 # Build
     npm run build
+
+# Deploy 
+    bash deploy.sh

@@ -100,24 +100,49 @@ function tryForFullScreen(): void {
   document.body.requestFullscreen();
 }
 
-function createback(x: number, y: number, onbackCallback: () => void): Sprite {
+function createbtn(btnText: string, callback: () => void): Sprite {
   const buttonTex = Texture.from('button');
   const button = new Sprite(buttonTex);
   // button.anchor.set(1, 0);
-  button.y = y;
-  button.x = x - buttonTex.width;
   button.interactive = true;
-  button.name = 'back_btn';
-  button.addListener('pointerdown', onbackCallback);
-  const text = new Text('back', {
+  button.addListener('pointerdown', callback);
+  const text = new Text(btnText, {
     align: 'left',
     fill: 0xffffff,
     fontSize: 24,
   });
   // text.x = 0;
-  text.anchor.set(-0.5, 0);
+  text.anchor.set(0, 0);
   button.addChild(text);
   return button;
+}
+
+function createback(x: number, y: number, onbackCallback: () => void): Sprite {
+  const button = createbtn('back', onbackCallback);
+  // button.anchor.set(1, 0);
+  button.y = y;
+  button.x = x - button.width;
+  button.interactive = true;
+  button.name = 'back_btn';
+  (button.children[0] as Text)?.anchor?.set(-0.5, 0);
+  return button;
+}
+
+function createfullscreen(x: number, y: number, callback: () => void): Sprite {
+  const button = createbtn('fullscreen', callback);
+  // button.anchor.set(1, 0);
+  button.y = y;
+  button.x = x - button.width * 2;
+  button.interactive = true;
+  button.name = 'full_btn';
+  return button;
+}
+
+function closeLoadingScreen(): void {
+  const loadingScreen = document.getElementById('loadingScreen');
+  if (loadingScreen) {
+    loadingScreen.style.display = 'none';
+  }
 }
 
 // when loader is ready
@@ -160,10 +185,17 @@ loader.load(() => {
     gameMenu.activate();
   });
 
+  const fullScreenBtn = createfullscreen(screenConfig.width, 0, () => {
+    console.log('full button');
+    document.head.requestFullscreen();
+  });
+
   app.stage.addChild(backBtn);
+  app.stage.addChild(fullScreenBtn);
   gameMenu.activate();
   backBtn.visible = false;
   // cardsShuffler.activate();
+  closeLoadingScreen();
   gameMenu
     .optionSelected
     .subscribe((option) => {

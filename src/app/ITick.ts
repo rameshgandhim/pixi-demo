@@ -4,7 +4,7 @@ function checkArg(instance: any, arg: string, argType: string) {
 }
 
 export interface ITick {
-  tick(): void;
+  tick(delta?: number): void;
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

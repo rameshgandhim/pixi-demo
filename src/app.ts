@@ -38,8 +38,8 @@ declare let window: Window & { PIXI: unknown };
 window.PIXI = PIXI;
 // document.head.requestFullscreen();
 
-const bodyWidth = window.screen.width;
-const bodyHeight = window.screen.height;
+const bodyWidth = document.body.clientWidth;
+const bodyHeight = document.body.clientHeight;
 const canvasElement = document.getElementById('gameCanvas') as HTMLCanvasElement;
 
 console.log('body widht and height', bodyWidth, bodyHeight);
@@ -49,12 +49,26 @@ const app = new Application({
   sharedTicker: true,
   sharedLoader: true,
   // resolution: devicePixelRatio,
-  // resizeTo: document,
+  resizeTo: canvasElement,
   antialias: true,
   view: canvasElement,
   width: bodyWidth,
   height: bodyHeight,
 });
+
+function resize() {
+  app.stage.scale.x = window.innerWidth / bodyWidth;
+  app.stage.scale.y = window.innerHeight / bodyHeight;
+  app.renderer.resize(window.innerWidth,
+    window.innerHeight);
+  // app.resizeTo(canvasElement);
+  // app.renderer.resize(Math.ceil(bodyWidth * ratio),
+  //   Math.ceil(GAME_HEIGHT * ratio));
+}
+window.addEventListener('resize', () => resize());
+
+// fake full screen
+window.scrollTo(0, 1);
 
 document.body.appendChild(app.view);
 const loader = Loader.shared;
@@ -67,6 +81,9 @@ loader.add('cards', '/assets/spritesheets/cards.json');
 loader.add('random', '/assets/spritesheets/random.json');
 loader.add('background', '/assets/img/background.jpg');
 loader.add('button', '/assets/img/button.png');
+loader.add('flame', '/assets/img/fire.png');
+loader.add('particle', '/assets/img/particle.png');
+loader.add('spark', '/assets/img/spark.png');
 
 function deactivateAll(): void {
   gameObjects.forEach((g) => {
@@ -128,11 +145,12 @@ loader.load(() => {
   tickers.push(tweener);
   const gameMenu = new GameMenu(screenConfig);
   const cardsShuffler = new CardShuffler(loader, tweener, screenConfig);
-  const fireParticle = new FireParticle();
+  const fireParticle = new FireParticle(screenConfig);
   const randomImageTool = new RandomImageTool(loader, screenConfig);
   addGameObject(gameMenu);
   addGameObject(cardsShuffler);
   addGameObject(fireParticle);
+  tickers.push(fireParticle);
   addGameObject(randomImageTool);
 
   const backBtn = createback(screenConfig.width, 0, () => {
@@ -149,7 +167,6 @@ loader.load(() => {
   // cardsShuffler.activate();
   gameMenu
     .optionSelected
-    .pipe(distinctUntilChanged())
     .subscribe((option) => {
       deactivateAll();
       tryForFullScreen();
@@ -172,9 +189,9 @@ loader.load(() => {
       }
     });
 
-  ticker.add(() => {
+  ticker.add((delta: number) => {
     for (let i = 0; i < tickers.length; i += 1) {
-      tickers[i].tick();
+      tickers[i].tick(delta);
     }
   });
 });

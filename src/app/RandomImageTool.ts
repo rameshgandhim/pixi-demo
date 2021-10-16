@@ -94,7 +94,8 @@ export class RandomImageTool extends GameObject {
   private start() {
     if (this.subscription != null) {
       this.unsubscribe();
-      this.reset();
+      this.startBtnText.text = 'Start';
+      // this.reset();
     } else {
       this.helpText.visible = false;
       this.subscription = new Subscription();
@@ -126,12 +127,6 @@ export class RandomImageTool extends GameObject {
     const obj2 = this.addTextOrImage('weather/r1', totalRandomTexts2);
     this.panel.addChild(obj2);
 
-    if (this.screen.orientation === 'landscape') {
-      obj2.x = obj1.width + padding;
-    } else {
-      obj2.y = obj1.height + padding;
-    }
-
     // third gifts
     const obj3 = this.addTextOrImage('emoticons/r2', totalRandomTexts3);
     this.panel.addChild(obj3);
@@ -147,12 +142,18 @@ export class RandomImageTool extends GameObject {
       obj3.y = maxHeight * 2 + padding;
     }
 
-    // console.log(`Max Height ${maxHeight} and Width ${maxWidth}`);
+    if (this.screen.orientation === 'landscape') {
+      obj2.x = maxWidth + padding;
+    } else {
+      obj2.y = maxHeight + padding;
+    }
+
+    console.log(`Max Height ${maxHeight} and Width ${maxWidth}`);
 
     for (let i = 0; i < 2; i += 1) {
       const selectedObj = allObjects[i];
       if (selectedObj instanceof Text) {
-        // console.log(`Index ${i} is text`);
+        console.log(`Index ${i} is text`);
         if (this.screen.orientation === 'landscape') {
           selectedObj.y = maxHeight / 2 + padding;
         } else {

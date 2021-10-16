@@ -1,5 +1,5 @@
 import {
-  Text,
+  Text, Graphics,
 } from 'pixi.js';
 
 import {
@@ -32,12 +32,22 @@ export class GameMenu extends GameObject {
     const buttons = ['Card Shuffler', 'Random Image Tool', 'Fire Particle'];
 
     buttons.forEach((b: string, i: number) => {
-      const btn = new Text(b, { fill: 0xffffff });
+      const btn = new Graphics();
+      btn.beginFill(0x4287f5);
+      btn.drawRect(0, 0, 350, 40);
+      const text = new Text(b, {
+        align: 'center',
+        fill: 0xffffff,
+      });
+      text.x = 50;
+      text.y = 5;
+      text.anchor.set(0, 0);
       btn.interactive = true;
       btn.buttonMode = true;
       btn.on('pointerdown', () => this.OnPress(i));
       btn.addListener('mousedown', () => this.OnPress(i));
       btn.y += (btn.height + spacing) * i;
+      btn.addChild(text);
       this.addChild(btn);
     });
     this.addListener('pointerdown', (e: any) => {

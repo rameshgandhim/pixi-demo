@@ -6,16 +6,16 @@ import {
 } from 'rxjs';
 import { GameObject } from './GameObject';
 import { ScreenConfig } from './ScreenConfig';
-import { backout, Tweener } from './Tween';
+import { backout, Tween, Tweener } from './Tween';
 
-const totalSprites = 5;
+const totalSprites = 144;
 const availableSprites = 56;
 
 // eslint-disable-next-line import/prefer-default-export
 export class CardShuffler extends GameObject {
   sprites: Sprite[] = [];
 
-  subscription: Subscription = new Subscription();
+  subscription: Subscription | null = null;
 
   startBtnText: Text
 
@@ -26,6 +26,8 @@ export class CardShuffler extends GameObject {
   currentShufflingIdx = 0;
 
   shuffledCardYAxis = 0;
+
+  pendingTweens: Tween[] = [];
 
   constructor(private loader: Loader,
     private tweener: Tweener,
@@ -74,8 +76,6 @@ export class CardShuffler extends GameObject {
 
   private readonly constructSprites = () => {
     const cardsSpriteSheet = this.loader.resources.cards.spritesheet;
-    const totalWidth = this.screen.width;
-    const offset = (totalWidth - this.widthOfACard * 2) / totalSprites;
 
     for (let i = 0; i < totalSprites; i += 1) {
       const spriteIdx = i % availableSprites;
@@ -85,7 +85,7 @@ export class CardShuffler extends GameObject {
         const sprite = new Sprite(texture);
         // sprite.skew.x = (offset) * 0;
         // sprite.rotation = 0.1 * i * (0.1 * i);
-        sprite.x = offset * i;
+        // sprite.x = offset * i;
         // sprite.y = 10 * i;
         this.sprites.push(sprite);
         this.addChild(sprite);
@@ -95,12 +95,22 @@ export class CardShuffler extends GameObject {
 
   private resetCards() {
     const totalWidth = this.screen.width;
+    const totalHeight = this.screen.height;
     const offset = (totalWidth - this.widthOfACard * 2) / totalSprites;
+    const offsetP = (totalHeight - this.heightOfACard * 2) / totalSprites;
 
     for (let i = 0; i < this.sprites.length; i += 1) {
       const sprite = this.sprites[i];
       if (sprite) {
-        sprite.x = offset * i;
+        this.removeChild(sprite);
+        this.addChild(sprite);
+        if (this.screen.orientation === 'landscape') {
+          sprite.x = offset * i;
+          sprite.y = 0;
+        } else {
+          sprite.y = offsetP * i;
+          sprite.x = 0;
+        }
       }
     }
   }
@@ -116,32 +126,47 @@ export class CardShuffler extends GameObject {
     const cardToShuffle = this.sprites[idx];
     this.removeChild(cardToShuffle);
     this.addChild(cardToShuffle);
-    this.tweener.tweenTo(cardToShuffle,
-      'x',
+    const isLandscape = this.screen.orientation === 'landscape';
+
+    const t1 = this.tweener.tweenTo(cardToShuffle,
+      isLandscape ? 'x' : 'y',
       this.getPositionOfCard(shuffledPos),
       2000,
       backout(0.3),
       undefined,
-      () => this.onShuffleComplete(idx));
+      (t) => this.onShuffleComplete(t, idx));
 
-    this.tweener.tweenTo(cardToShuffle,
-      'y',
-      300,
+    const t2 = this.tweener.tweenTo(cardToShuffle,
+      isLandscape ? 'y' : 'x',
+      isLandscape ? 300 : this.screen.width - this.widthOfACard,
       2000,
       backout(0.3));
+
+    this.pendingTweens.push(t1, t2);
   }
 
-  private onShuffleComplete(idx: number): void {
+  private onShuffleComplete(tween: Tween, idx: number): void {
     console.log('shuffle completed for ', idx);
 
-    if (idx !== 0) {
+    const pendingIdx = this.pendingTweens.indexOf(tween);
+    if (pendingIdx >= 0) {
+      this.pendingTweens.splice(pendingIdx, 1);
+    }
+
+    if (idx !== 0 && this.visible) {
       this.startShuffling();
     }
   }
 
   private getPositionOfCard(idx: number): number {
     const totalWidth = this.screen.width;
-    const offset = (totalWidth - this.widthOfACard * 2) / totalSprites;
+    const totalHeight = this.screen.height;
+    let offset = 0;
+    if (this.screen.orientation === 'landscape') {
+      offset = (totalWidth - this.widthOfACard * 2) / totalSprites;
+    } else {
+      offset = (totalHeight - this.heightOfACard * 2) / totalSprites;
+    }
     return offset * idx;
   }
 
@@ -152,11 +177,22 @@ export class CardShuffler extends GameObject {
   }
 
   deactivate(): void {
+    this.unsubscribe();
     super.deactivate();
   }
 
   reset(): void {
     this.resetCards();
     this.currentShufflingIdx = totalSprites;
+  }
+
+  private unsubscribe() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+      this.subscription = null;
+    }
+
+    this.pendingTweens.forEach((t) => this.tweener.stop(t));
+    this.pendingTweens = [];
   }
 }

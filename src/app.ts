@@ -2,7 +2,6 @@ import * as PIXI from 'pixi.js';
 import {
   Application, Loader, Ticker, Sprite, Texture, Text,
 } from 'pixi.js';
-import { distinctUntilChanged } from 'rxjs';
 import { initializeApp } from 'firebase/app';
 import { CardShuffler } from './app/CardsShuffler';
 import { FireParticle } from './app/FireParticle';

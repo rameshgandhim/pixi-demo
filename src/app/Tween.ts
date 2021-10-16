@@ -74,4 +74,11 @@ export class Tweener implements ITick {
     this.tweening.push(tween);
     return tween;
   }
+
+  stop(t: Tween) {
+    const idx = this.tweening.indexOf(t);
+    if (idx >= 0) {
+      this.tweening.splice(idx, 1);
+    }
+  }
 }

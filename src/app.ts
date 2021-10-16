@@ -12,6 +12,7 @@ import { GameObject } from './app/GameObject';
 import { ITick } from './app/ITick';
 import { RandomImageTool } from './app/RandomImageTool';
 import { Tweener } from './app/Tween';
+import { ScreenConfig } from './app/ScreenConfig';
 
 // Import the functions you need from the SDKs you need
 // TODO: Add SDKs for Firebase products that you want to use
@@ -24,7 +25,7 @@ const firebaseConfig = {
   projectId: 'pixijs-demo-f3037',
   storageBucket: 'pixijs-demo-f3037.appspot.com',
   messagingSenderId: '71883800219',
-  appId: '1:71883800219:web:e78d82f9ba030aa69b903e'
+  appId: '1:71883800219:web:e78d82f9ba030aa69b903e',
 };
 
 // Initialize Firebase
@@ -42,7 +43,7 @@ const app = new Application({
   backgroundColor: 0x1099bb, // light blue
   sharedTicker: true,
   sharedLoader: true,
-  resolution: devicePixelRatio,
+  // resolution: devicePixelRatio,
   resizeTo: window,
 });
 document.body.style.width = '100wh';
@@ -56,6 +57,7 @@ const gameObjects: GameObject[] = [];
 
 // preload needed assets
 loader.add('cards', '/assets/spritesheets/cards.json');
+loader.add('random', '/assets/spritesheets/random.json');
 loader.add('background', '/assets/img/background.jpg');
 loader.add('button', '/assets/img/button.png');
 
@@ -96,10 +98,15 @@ function createback(onbackCallback: () => void): Sprite {
 
 // when loader is ready
 loader.load(() => {
+  const screenConfig: ScreenConfig = {
+    width: app.screen.width,
+    height: app.screen.height,
+    orientation: app.screen.width > app.screen.height ? 'landscape' : 'portrait',
+  };
   const backgroundTexture = Texture.from('background');
   const background = new Sprite(backgroundTexture);
-  background.scale.x = window.screen.width / backgroundTexture.width;
-  background.scale.y = window.screen.height / backgroundTexture.height;
+  background.scale.x = screenConfig.width / backgroundTexture.width;
+  background.scale.y = screenConfig.height / backgroundTexture.height;
   app.stage.addChild(background);
   const fpsMeter = new FPSMeter(ticker);
 
@@ -109,10 +116,10 @@ loader.load(() => {
 
   const tweener = new Tweener();
   tickers.push(tweener);
-  const gameMenu = new GameMenu();
-  const cardsShuffler = new CardShuffler(loader, tweener);
+  const gameMenu = new GameMenu(screenConfig);
+  const cardsShuffler = new CardShuffler(loader, tweener, screenConfig);
   const fireParticle = new FireParticle();
-  const randomImageTool = new RandomImageTool();
+  const randomImageTool = new RandomImageTool(loader, screenConfig);
   addGameObject(gameMenu);
   addGameObject(cardsShuffler);
   addGameObject(fireParticle);

@@ -5,6 +5,7 @@ import {
   Subscription, timer, take, firstValueFrom,
 } from 'rxjs';
 import { GameObject } from './GameObject';
+import { ScreenConfig } from './ScreenConfig';
 import { backout, Tweener } from './Tween';
 
 const totalSprites = 5;
@@ -26,7 +27,9 @@ export class CardShuffler extends GameObject {
 
   shuffledCardYAxis = 0;
 
-  constructor(private loader: Loader, private tweener: Tweener) {
+  constructor(private loader: Loader,
+    private tweener: Tweener,
+    private screen: ScreenConfig) {
     super();
     const cardsSpriteSheet = this.loader.resources.cards.spritesheet;
     const textureOfCard = cardsSpriteSheet?.textures['1.png'];
@@ -47,7 +50,7 @@ export class CardShuffler extends GameObject {
     button.anchor.x = 0.5;
     button.anchor.y = 0;
     button.y = this.y + this.heightOfACard;
-    button.x = window.screen.width / 2;
+    button.x = this.screen.width / 2;
     button.interactive = true;
     button.buttonMode = true;
     button.addListener('pointerdown', () => this.onStart());
@@ -71,7 +74,7 @@ export class CardShuffler extends GameObject {
 
   private readonly constructSprites = () => {
     const cardsSpriteSheet = this.loader.resources.cards.spritesheet;
-    const totalWidth = window.screen.width;
+    const totalWidth = this.screen.width;
     const offset = (totalWidth - this.widthOfACard * 2) / totalSprites;
 
     for (let i = 0; i < totalSprites; i += 1) {
@@ -91,7 +94,7 @@ export class CardShuffler extends GameObject {
   }
 
   private resetCards() {
-    const totalWidth = window.screen.width;
+    const totalWidth = this.screen.width;
     const offset = (totalWidth - this.widthOfACard * 2) / totalSprites;
 
     for (let i = 0; i < this.sprites.length; i += 1) {
@@ -137,7 +140,7 @@ export class CardShuffler extends GameObject {
   }
 
   private getPositionOfCard(idx: number): number {
-    const totalWidth = window.screen.width;
+    const totalWidth = this.screen.width;
     const offset = (totalWidth - this.widthOfACard * 2) / totalSprites;
     return offset * idx;
   }

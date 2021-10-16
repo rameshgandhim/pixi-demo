@@ -6,6 +6,7 @@ import {
   Subject,
 } from 'rxjs';
 import { GameObject } from './GameObject';
+import { ScreenConfig } from './ScreenConfig';
 
 const spacing = 20;
 
@@ -15,15 +16,15 @@ export class GameMenu extends GameObject {
 
   optionSelected: Subject<number> = new Subject()
 
-  constructor() {
+  constructor(private screen: ScreenConfig) {
     super();
     this.constructMenu();
     this.centerScreen();
   }
 
   private readonly centerScreen = () => {
-    this.x = (window.screen.width - this.width) / 2;
-    this.y = (window.screen.height - this.height) / 2;
+    this.x = (this.screen.width - this.width) / 2;
+    this.y = (this.screen.height - this.height) / 2;
   }
 
   private readonly constructMenu = () => {

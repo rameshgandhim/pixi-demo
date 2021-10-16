@@ -3,6 +3,7 @@ import {
   Application, Loader, Ticker, Sprite, Texture, Text,
 } from 'pixi.js';
 import { distinctUntilChanged } from 'rxjs';
+import { initializeApp } from 'firebase/app';
 import { CardShuffler } from './app/CardsShuffler';
 import { FireParticle } from './app/FireParticle';
 import { FPSMeter } from './app/FPSMeter';
@@ -11,6 +12,25 @@ import { GameObject } from './app/GameObject';
 import { ITick } from './app/ITick';
 import { RandomImageTool } from './app/RandomImageTool';
 import { Tweener } from './app/Tween';
+
+// Import the functions you need from the SDKs you need
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: 'AIzaSyARWfnfZlizjmfmf9fktCMuVKm_C3c7o1I',
+  authDomain: 'pixijs-demo-f3037.firebaseapp.com',
+  projectId: 'pixijs-demo-f3037',
+  storageBucket: 'pixijs-demo-f3037.appspot.com',
+  messagingSenderId: '71883800219',
+  appId: '1:71883800219:web:e78d82f9ba030aa69b903e'
+};
+
+// Initialize Firebase
+const firebaseApp = initializeApp(firebaseConfig);
+
+console.log('initialized firebase app', firebaseApp.name);
 
 // Enables Pixi Dev tool to work
 declare let window: Window & { PIXI: unknown };
@@ -80,7 +100,7 @@ loader.load(() => {
   const background = new Sprite(backgroundTexture);
   background.scale.x = window.screen.width / backgroundTexture.width;
   background.scale.y = window.screen.height / backgroundTexture.height;
-  // app.stage.addChild(background);
+  app.stage.addChild(background);
   const fpsMeter = new FPSMeter(ticker);
 
   app.stage.addChild(fpsMeter);
